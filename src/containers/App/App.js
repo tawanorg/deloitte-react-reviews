@@ -1,27 +1,71 @@
 /* eslint-disable */
-
 import React, { Component } from 'react';
- 
+import { connect } from 'react-redux';
 // components
 import Slider from '../../components/Slider';
 import Jumbotron from '../../components/Jumbotron';
 import ImageDynamicLayout from '../../components/ImageDynamicLayout';
 import Headline from '../../components/Headline';
+import DummyData from '../../dummyData.js';
 
-export default class HomeContainer extends React.Component {
+// redux action
+import { 
+  LOAD_DATA_REQUEST,
+  LOAD_DATA_SUCCESS,
+  LOAD_DATA_ERROR } from '../../actions/AppAction';
+
+const mapStateToProps = (state) => {
+  return {
+    initialData: state.app.data,
+    isFetching: state.app.isFetching
+  }
+}
+
+export class App extends React.Component {
  
   constructor(props) {
     super(props);
-    this.state = {}
+    this.state = {
+      isReady: false
+    }
   }
 
-  componentDidMount() {
-    this.setState({
-      isReady: true
-    });
+  componentWillMount() {
+    
+    this.props.dispatch({
+      type: LOAD_DATA_REQUEST
+    })
+
+    if(DummyData.length !== 0) {
+      let _dummyData = DummyData.reduce(data => data);
+        this.props.dispatch({
+          type: LOAD_DATA_SUCCESS,
+          payload: Object.assign({}, this.state, {
+            isReady: true,
+            ..._dummyData
+          })
+        })
+    }
+    else {
+      this.props.dispatch({
+        type: LOAD_DATA_ERROR,
+        error: true
+      })
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if(nextProps.initialData != null) {
+      this.setState(nextProps.initialData);
+    }
   }
 
   render() {
+
+    if(!this.state.isReady) {
+      return (<div>Loading..</div>)
+    }
+
     return (
       <div>
         <div className="container">
@@ -78,6 +122,7 @@ export default class HomeContainer extends React.Component {
 
 }
 
+export default connect(mapStateToProps)(App)
 
 
 
