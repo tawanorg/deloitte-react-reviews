@@ -1,12 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
-import '../static/style.css';
-
-global.jQuery = require('jquery');;
-require('bootstrap');
+import { configureStore } from './store';
+// Initialize store
+const store = configureStore(window.__INITIAL_STATE__);
+const mountApp = document.getElementById('root');
 
 ReactDOM.render(
-  <App />,
-  document.getElementById('root')
+  <App store={store}/>,
+  mountApp
 );
